@@ -1,8 +1,14 @@
-import React from "react";
+import React, { useEffect } from "react";
 import PostList from "./PostList";
 import { Jumbotron } from "react-bootstrap";
+import { getAllTitlesAPI } from "./reducers/actionCreators";
+import { useDispatch } from "react-redux";
 
 function Homepage() {
+  const dispatch = useDispatch();
+  useEffect(() => {
+    dispatch(getAllTitlesAPI());
+  }, [dispatch]);
   return (
     <div>
       <Jumbotron>

@@ -2,31 +2,67 @@ import {
   ADD_POST,
   DELETE_POST,
   EDIT_POST,
+  GET_ALL_TITLES,
   ADD_COMMENT,
-  DELETE_COMMENT
+  DELETE_COMMENT,
+  GET_POST,
+  VOTE_POST,
+  VOTE_TITLE
 } from "./actionTypes";
 /**posts = */
-const INITIAL_STATE = { posts: {} };
+const INITIAL_STATE = { posts: {}, titles: {} };
 function rootReducer(state = INITIAL_STATE, action) {
-  let postId = action.payload.id;
+  let postId;
 
   switch (action.type) {
-    case ADD_POST:
-      const newPost = { ...action.payload.post, comments: [] };
+    /** for POST_VIEW */
+    case VOTE_POST:
+      console.log("votes", action.payload.votes);
+      const updatedPost = {
+        ...state.posts[action.payload.postId],
+        votes: action.payload.votes.votes
+      };
       return {
         ...state,
-        posts: { ...state.posts, [postId]: newPost }
+        posts: { ...state.posts, [action.payload.postId]: updatedPost }
+      };
+    /** for TITLE_LIST */
+    case VOTE_TITLE:
+      const updatedTitle = {
+        ...state.titles[action.payload.postId],
+        votes: action.payload.votes.votes
+      };
+      return {
+        ...state,
+        titles: { ...state.titles, [action.payload.postId]: updatedTitle }
+      };
+
+    case GET_ALL_TITLES:
+      const titles = {};
+      action.payload.titles.forEach(
+        (title) => (titles[title.id] = { ...title })
+      );
+      return {
+        ...state,
+        titles: titles
+      };
+    case GET_POST:
+      return {
+        ...state,
+        posts: { [action.payload.post.id]: action.payload.post }
       };
 
     case DELETE_POST:
-      let newPosts = { ...state.posts };
-      delete newPosts[postId];
-      return { ...state, posts: newPosts };
+      let newTitles = { ...state.titles };
+      postId = action.payload.postId;
+      delete newTitles[postId];
+      return { ...state, titles: newTitles };
 
     case EDIT_POST:
+      postId = action.payload.post.id;
       const editedPost = {
         ...state.posts[postId],
-        ...action.payload
+        ...action.payload.post
       };
       return {
         ...state,
@@ -34,6 +70,7 @@ function rootReducer(state = INITIAL_STATE, action) {
       };
 
     case ADD_COMMENT:
+      postId = action.payload.postId;
       return {
         ...state,
         posts: {
@@ -49,6 +86,7 @@ function rootReducer(state = INITIAL_STATE, action) {
       };
 
     case DELETE_COMMENT:
+      postId = action.payload.postId;
       const newComments = state.posts[postId].comments.filter(
         (c) => c.id !== action.payload.commentId
       );

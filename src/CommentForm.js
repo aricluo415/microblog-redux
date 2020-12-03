@@ -1,8 +1,8 @@
 import React, { useState } from "react";
 import { Button, Form } from "react-bootstrap";
-import { addComment } from "./reducers/actions";
-import { v4 as uuid } from "uuid";
 import { useDispatch } from "react-redux";
+import { v4 as uuid } from "uuid";
+import { addCommentsAPI } from "./reducers/actionCreators";
 
 const INITIAL_DATA = { comment: "" };
 
@@ -20,8 +20,7 @@ function CommentForm({ postId }) {
 
   function handleSubmit(evt) {
     evt.preventDefault();
-    const comment = { comment: formData.comment, id: uuid() };
-    dispatch(addComment(comment, postId));
+    dispatch(addCommentsAPI(formData.comment, postId));
     setFormData(INITIAL_DATA);
   }
 

@@ -1,18 +1,28 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { useParams } from "react-router";
-import { Card, Button, Modal } from "react-bootstrap";
+import { Card, Button, Modal, Col, Row, Container } from "react-bootstrap";
 import PostForm from "./PostForm";
 import CommentForm from "./CommentForm";
 import { useHistory } from "react-router";
 import CommentList from "./CommentList";
 import { useSelector, useDispatch } from "react-redux";
-import { removePost, editPost } from "./reducers/actions";
-
+import {
+  removePostFromAPI,
+  editPostFromAPI,
+  getPostAPI
+} from "./reducers/actionCreators";
+import Vote from "./Vote";
 function PostView() {
   const { postId } = useParams();
-  const post = useSelector((store) => store.posts[postId]);
-
   const dispatch = useDispatch();
+  let post = useSelector((store) => store.posts[postId]);
+  console.log("POST ALREADY EXISTS?", post);
+
+  useEffect(() => {
+    console.log("------->UPDATE POST DETAIL VIA API");
+    dispatch(getPostAPI(postId));
+  }, [dispatch]);
+
   const [show, setShow] = useState(false);
   const history = useHistory();
 
@@ -22,14 +32,25 @@ function PostView() {
   function handleShow() {
     setShow(true);
   }
-  function handleDelete() {
-    dispatch(removePost(postId));
+  async function handleDelete() {
+    await dispatch(removePostFromAPI(postId));
     history.push("/");
   }
+  if (!post) return <div>Loading...</div>;
+  console.log(post);
   return (
     <div>
       <Card className="m-4">
-        <Card.Header>{post.title}</Card.Header>
+        <Card.Header>
+          <Container className="p-0">
+            <Row>
+              <Col className="col-auto mr-auto">{post.title}</Col>
+              <Col className="col-auto m-0">
+                <Vote post={post} type={"post"} />
+              </Col>
+            </Row>
+          </Container>
+        </Card.Header>
         <Card.Body>
           <Card.Title>{post.description}</Card.Title>
           <Card.Text>{post.body}</Card.Text>
@@ -51,9 +72,9 @@ function PostView() {
 function EditForm({ show, handleClose, post }) {
   const dispatch = useDispatch();
 
-  function handleSubmit(evt, editedPost) {
+  async function handleSubmit(evt, editedPost) {
     evt.preventDefault();
-    dispatch(editPost(editedPost));
+    await dispatch(editPostFromAPI(editedPost));
     handleClose();
   }
   return (

@@ -1,13 +1,13 @@
 import React from "react";
 import { Button, ListGroup, Col, Row } from "react-bootstrap";
-import { deleteComment } from "./reducers/actions";
+import { deleteCommentAPI } from "./reducers/actionCreators";
 import { useDispatch } from "react-redux";
 
 function CommentList({ comments, postId }) {
   const dispatch = useDispatch();
 
-  function handleDelete(commentId) {
-    dispatch(deleteComment(commentId, postId));
+  async function handleDelete(commentId) {
+    await dispatch(deleteCommentAPI(commentId, postId));
   }
 
   return (
@@ -18,7 +18,7 @@ function CommentList({ comments, postId }) {
           <ListGroup.Item className="mx-4" key={c.id}>
             <Row>
               <Col className="py-1" sm={11}>
-                <div>{c.comment}</div>
+                <div>{c.text}</div>
               </Col>
               <Col sm={1}>
                 <Button variant="light" onClick={() => handleDelete(c.id)}>

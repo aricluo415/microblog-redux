@@ -2,14 +2,14 @@ import React from "react";
 import PostForm from "./PostForm";
 import { useHistory } from "react-router";
 import { useDispatch } from "react-redux";
-import { addPost } from "./reducers/actions";
+import { addPostToAPI } from "./reducers/actionCreators";
 import { v4 as uuid } from "uuid";
 
 function NewPost() {
   const dispatch = useDispatch();
   const history = useHistory();
 
-  function handleSubmit(evt, formData) {
+  async function handleSubmit(evt, formData) {
     evt.preventDefault();
     const newPost = {
       title: formData.title,
@@ -17,7 +17,7 @@ function NewPost() {
       body: formData.body,
       id: uuid()
     };
-    dispatch(addPost(newPost));
+    await dispatch(addPostToAPI(newPost));
     history.push("/");
   }
 
